@@ -91,3 +91,49 @@ print("Q1 finding:", q1_sentence, "\n")
 # Q1 finding: The South region was the top region with $565,862 in revenue,
 # 58% above the average region ($357,172).
 # (Note: "Unknown" is the 108 orders Lab 14 couldn't match to a region.)
+
+
+# ===========================================================================
+# Q2: Monthly revenue trend  (Exercise 2)
+# Business question: How does revenue change month to month, and when is the peak?
+# ===========================================================================
+df["month"] = df["order_date"].dt.month
+monthly = df.groupby("month")["revenue"].sum().reset_index()
+print("Q2 — Revenue by month")
+print(monthly.to_string(index=False), "\n")
+
+month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+avg_month = monthly["revenue"].mean()
+peak = monthly.loc[monthly["revenue"].idxmax()]
+peak_name = month_names[int(peak["month"]) - 1]
+
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.plot(monthly["month"], monthly["revenue"], marker="o", markersize=7,
+        linewidth=2, color=BLUE, label="Monthly revenue")
+ax.axhline(avg_month, color=DARK_GRAY, linestyle="--", linewidth=1,
+           label=f"Monthly average ({dollars(avg_month)})")
+ax.annotate(f"Peak: {peak_name}\n{dollars(peak['revenue'])}",
+            xy=(peak["month"], peak["revenue"]),
+            xytext=(peak["month"] - 2.6, peak["revenue"] - 8000),
+            fontsize=9, arrowprops=dict(arrowstyle="->", color=DARK_GRAY))
+ax.set_xticks(range(1, 13))           # all 12 months on the x-axis
+ax.set_xticklabels(month_names)
+ax.set_title("Revenue Climbs Into a December Peak")
+ax.set_xlabel("Month (2025)")
+ax.set_ylabel("Total Revenue (USD)")
+ax.yaxis.set_major_formatter(lambda v, _: dollars(v))
+ax.grid(axis="y", alpha=0.3)
+ax.legend(frameon=False, loc="upper left")
+fig.tight_layout()
+fig.savefig(CHART_DIR / "q2_monthly_trend.png")
+plt.close(fig)
+
+q2_pct_above = (peak["revenue"] / avg_month - 1) * 100
+q2_sentence = (
+    f"{peak_name} was the peak month with {dollars(peak['revenue'])} in revenue, "
+    f"{q2_pct_above:.1f}% above the monthly average of {dollars(avg_month)}."
+)
+print("Q2 finding:", q2_sentence, "\n")
+# Q2 finding: Dec was the peak month with $197,308 in revenue, 32.6% above the
+# monthly average of $148,822.
