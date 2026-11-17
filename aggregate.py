@@ -196,3 +196,61 @@ print("Q3 finding:", q3_sentence, "\n")
 # the average up. An analyst describing a "typical" order should use the median;
 # the mean is still useful for totals and forecasting revenue.
 # (The few negative values are returns/refunds that Lab 14 kept in the data.)
+
+
+# ===========================================================================
+# Q4: Custom question  (Exercise 4)
+# Business question: Which product categories "punch above their weight" —
+# bringing in a bigger share of revenue than their share of orders?
+# A manager would use this to decide which categories deserve more shelf space,
+# marketing budget, or sales attention.
+# ===========================================================================
+cat = df.groupby("product_category").agg(
+    revenue=("revenue", "sum"),
+    orders=("order_id", "count"),
+)
+cat["revenue_share"] = cat["revenue"] / cat["revenue"].sum() * 100
+cat["order_share"] = cat["orders"] / cat["orders"].sum() * 100
+cat = cat.sort_values("revenue_share")
+print("Q4 — Share of revenue vs share of orders by category")
+print(cat.round(1).to_string(), "\n")
+
+# Chart choice: a grouped horizontal bar chart. Both measures are percentages on the
+# same 0-100 scale, so they can share one axis and be compared side by side within
+# each category. Horizontal bars leave room for long category names like
+# "Office Supplies", and sorting by revenue share puts the biggest earners on top.
+# A pie chart would make this comparison much harder to read.
+fig, ax = plt.subplots(figsize=(9, 5.5))
+y = range(len(cat))
+h = 0.38
+ax.barh([i + h / 2 for i in y], cat["revenue_share"], height=h, color=BLUE,
+        label="Share of revenue")
+ax.barh([i - h / 2 for i in y], cat["order_share"], height=h, color=ORANGE,
+        label="Share of orders")
+ax.set_yticks(list(y))
+ax.set_yticklabels(cat.index)
+for i, (rs, os_) in enumerate(zip(cat["revenue_share"], cat["order_share"])):
+    ax.text(rs + 0.4, i + h / 2, f"{rs:.1f}%", va="center", fontsize=8)
+    ax.text(os_ + 0.4, i - h / 2, f"{os_:.1f}%", va="center", fontsize=8, color=DARK_GRAY)
+ax.set_title("Electronics & Furniture Earn Far More Than Their Order Count Suggests")
+ax.set_xlabel("Percent of 2025 Total (%)")
+ax.set_ylabel("Product Category")
+ax.grid(axis="x", alpha=0.3)
+ax.set_axisbelow(True)
+ax.legend(frameon=False, loc="lower right")
+fig.tight_layout()
+fig.savefig(CHART_DIR / "q4_custom.png")
+plt.close(fig)
+
+elec = cat.loc["Electronics"]
+q4_sentence = (
+    f"Electronics drove {dollars(elec['revenue'])} ({elec['revenue_share']:.1f}% of revenue) "
+    f"from only {elec['order_share']:.1f}% of orders, while Paper and Office Supplies "
+    f"together make up {cat.loc[['Paper', 'Office Supplies'], 'order_share'].sum():.1f}% "
+    f"of orders but just {cat.loc[['Paper', 'Office Supplies'], 'revenue_share'].sum():.1f}% "
+    f"of revenue."
+)
+print("Q4 finding:", q4_sentence, "\n")
+# Q4 finding: Electronics drove $576,469 (32.3% of revenue) from only 12.3% of orders,
+# while Paper and Office Supplies together make up 37.7% of orders but just 13.6%
+# of revenue.
