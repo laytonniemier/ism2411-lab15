@@ -274,3 +274,32 @@ print("Highest average order value:", region_summary["avg_order_value"].idxmax()
 # Answer: South has the most orders (1,457). North has the highest average order
 # value at about $412.83 per order, even though South brings in more total revenue.
 # South wins on volume; North wins on order size.
+
+
+# ===========================================================================
+# Reflection — Self-Assessment
+# ===========================================================================
+# 1. 10-second test:
+#    Q1 — Yes. The South bar is the only blue one, and the title says it leads.
+#    Q2 — Yes. The annotated December peak and the dashed average line make the
+#         trend obvious. Without the average line, "% above average" would be hard
+#         to see, so that line matters.
+#    Q3 — Mostly. The tall bars on the left show most orders are small, and the two
+#         lines show the mean sitting well above the median. Someone new might not
+#         know what "right-skewed" means, so the title says it in plain words instead.
+#    Q4 — Yes, after a second look. The blue-vs-orange gap is the finding, and the
+#         title states it. A first-time viewer needs the legend, so it stays.
+#
+# 2. Findings as numbers with context:
+#    Q1 — The South region drove $565,862 in revenue, which is 58% above the
+#         average region ($357,172).
+#    Q2 — December drove $197,308 in revenue, which is 32.6% above the monthly
+#         average of $148,822.
+#    Q3 — The median order was $141, while the mean was $382 — 171% higher —
+#         because a few large orders skew the average upward.
+#
+# 3. What felt difficult or unclear:
+#    Deciding what to do with the "Unknown" region and the negative revenue rows
+#    (returns) from Lab 14 — I kept both so totals match the cleaned file, but for
+#    the capstone I need to decide up front and explain it. Formatting axes as
+#    dollars and getting all 12 months to show on the x-axis also took extra steps.
