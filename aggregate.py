@@ -137,3 +137,62 @@ q2_sentence = (
 print("Q2 finding:", q2_sentence, "\n")
 # Q2 finding: Dec was the peak month with $197,308 in revenue, 32.6% above the
 # monthly average of $148,822.
+
+
+# ===========================================================================
+# Q3: Order size distribution  (Exercise 3 — redone in Seaborn for Exercise 5)
+# Business question: What does a typical order look like, and is the mean misleading?
+# ===========================================================================
+median_order = df["revenue"].median()
+mean_order = df["revenue"].mean()
+skewness = df["revenue"].skew()
+print("Q3 — Order size")
+print(f"Median order size: {dollars(median_order)}  (exact: {median_order:.2f})")
+print(f"Mean order size:   {dollars(mean_order)}  (exact: {mean_order:.2f})")
+print(f"Skewness: {skewness:.2f}\n")
+
+# --- Original matplotlib version (replaced by Seaborn below for Exercise 5) ---
+# fig, ax = plt.subplots(figsize=(9, 5))
+# ax.hist(df["revenue"], bins=20, color=BLUE, edgecolor="white")
+# ax.set_title("Most Orders Are Small; a Few Big Ones Pull the Mean Up")
+# ax.set_xlabel("Order Revenue (USD)")
+# ax.set_ylabel("Number of Orders")
+# fig.savefig(CHART_DIR / "q3_order_distribution.png")
+
+# --- Seaborn version (Exercise 5) ---
+fig, ax = plt.subplots(figsize=(9, 5))
+sns.histplot(data=df, x="revenue", bins=20, color=BLUE, edgecolor="white", ax=ax)
+ax.axvline(median_order, color=DARK_GRAY, linestyle="--", linewidth=1.5,
+           label=f"Median {dollars(median_order)}")
+ax.axvline(mean_order, color=ORANGE, linestyle="-", linewidth=1.5,
+           label=f"Mean {dollars(mean_order)}")
+ax.set_title("Most Orders Are Small; a Few Big Ones Pull the Mean Up")
+ax.set_xlabel("Order Revenue (USD)")
+ax.set_ylabel("Number of Orders")
+ax.xaxis.set_major_formatter(lambda v, _: dollars(v))
+ax.legend(frameon=False)
+fig.tight_layout()
+fig.savefig(CHART_DIR / "q3_order_distribution.png")
+plt.close(fig)
+
+# Exercise 5 — one difference I noticed:
+# sns.histplot takes the DataFrame and the column name directly (data=df, x="revenue"),
+# so I don't have to pull the column out myself, and it labels the x-axis with the
+# column name automatically. The bars look the same, but Seaborn's default styling
+# is a little cleaner, and switching to a KDE curve or splitting by a category
+# (hue="region") is just one extra argument, which would take several lines in
+# plain matplotlib. The amount of code for the basic chart was about the same.
+
+q3_sentence = (
+    f"The distribution is strongly right-skewed (skewness {skewness:.2f}): the median "
+    f"order is {dollars(median_order)} but the mean is {dollars(mean_order)}, because a "
+    f"small number of large orders pull the average up. An analyst describing a "
+    f"'typical' order should use the median; the mean is still useful for totals and "
+    f"forecasting revenue."
+)
+print("Q3 finding:", q3_sentence, "\n")
+# Q3 finding: The distribution is strongly right-skewed (skewness 3.79): the median
+# order is $141 but the mean is $382, because a small number of large orders pull
+# the average up. An analyst describing a "typical" order should use the median;
+# the mean is still useful for totals and forecasting revenue.
+# (The few negative values are returns/refunds that Lab 14 kept in the data.)
