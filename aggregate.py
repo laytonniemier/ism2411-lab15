@@ -254,3 +254,23 @@ print("Q4 finding:", q4_sentence, "\n")
 # Q4 finding: Electronics drove $576,469 (32.3% of revenue) from only 12.3% of orders,
 # while Paper and Office Supplies together make up 37.7% of orders but just 13.6%
 # of revenue.
+
+
+# ===========================================================================
+# Exercise 6: Multiple aggregations with .agg()
+# ===========================================================================
+region_summary = df.groupby("region").agg(
+    total_revenue=("revenue", "sum"),
+    order_count=("order_id", "count"),
+)
+region_summary["avg_order_value"] = (
+    region_summary["total_revenue"] / region_summary["order_count"]
+)
+region_summary = region_summary.sort_values("total_revenue", ascending=False)
+print("Exercise 6 — Revenue and order count per region")
+print(region_summary.round(2).to_string(), "\n")
+print("Most orders:", region_summary["order_count"].idxmax())
+print("Highest average order value:", region_summary["avg_order_value"].idxmax(), "\n")
+# Answer: South has the most orders (1,457). North has the highest average order
+# value at about $412.83 per order, even though South brings in more total revenue.
+# South wins on volume; North wins on order size.
